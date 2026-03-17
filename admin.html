@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理画面 - りりかのプレゼント箱</title>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@300;400;500&family=Shippori+Mincho:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      background: linear-gradient(135deg, #fff5f8 0%, #fdf0f8 50%, #f5f0ff 100%);
+      min-height: 100vh;
+      color: #5a4a5a;
+    }
+
+    /* ============ 共通 ============ */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 13px 28px;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(135deg, #e890c0, #c870a8);
+      color: white;
+      font-size: 0.92rem;
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.2s;
+      box-shadow: 0 4px 16px rgba(200,100,150,0.3);
+    }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 11px 22px;
+      border-radius: 12px;
+      border: 1.5px solid rgba(220,160,190,0.6);
+      background: white;
+      color: #c06090;
+      font-size: 0.88rem;
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover { background: #fde8f3; }
+
+    .btn-danger {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 9px 18px;
+      border-radius: 10px;
+      border: 1.5px solid rgba(240,130,130,0.5);
+      background: white;
+      color: #e06070;
+      font-size: 0.82rem;
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-danger:hover { background: #fff0f0; }
+
+    input[type="text"], input[type="password"], textarea, select {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1.5px solid rgba(220,160,190,0.5);
+      background: #fff8fb;
+      font-size: 0.9rem;
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      color: #5a4a5a;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: #e090c0;
+      box-shadow: 0 0 0 3px rgba(220,120,170,0.12);
+    }
+    textarea { resize: vertical; min-height: 120px; line-height: 1.7; }
+
+    label {
+      display: block;
+      font-size: 0.82rem;
+      color: #a07090;
+      margin-bottom: 6px;
+      letter-spacing: 0.03em;
+    }
+
+    .field { margin-bottom: 18px; }
+
+    .card {
+      background: rgba(255,255,255,0.88);
+      border-radius: 20px;
+      padding: 28px 24px;
+      box-shadow: 0 4px 24px rgba(200,120,160,0.1);
+      border: 1px solid rgba(230,180,210,0.4);
+      backdrop-filter: blur(4px);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #7a4a6a;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 14px;
+      font-size: 0.88rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease;
+      z-index: 9999;
+      white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ============ ログイン ============ */
+    #loginScreen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .login-box {
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+    }
+
+    .login-box .icon { font-size: 48px; display: block; margin-bottom: 16px; }
+
+    .login-box h1 {
+      font-family: 'Shippori Mincho', serif;
+      font-size: 1.4rem;
+      color: #c06090;
+      margin-bottom: 6px;
+    }
+
+    .login-box p {
+      font-size: 0.82rem;
+      color: #b08090;
+      margin-bottom: 28px;
+    }
+
+    .login-error {
+      font-size: 0.82rem;
+      color: #e07090;
+      margin-top: 10px;
+      min-height: 1.2em;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .login-error.show { opacity: 1; }
+
+    /* ============ メイン画面 ============ */
+    #mainScreen {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 0 18px 80px;
+    }
+
+    .admin-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 0 24px;
+    }
+
+    .admin-header h2 {
+      font-family: 'Shippori Mincho', serif;
+      font-size: 1.2rem;
+      color: #c06090;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header-actions { display: flex; gap: 10px; align-items: center; }
+
+    /* 公開ボタン */
+    .publish-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 11px 22px;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(135deg, #7090e8, #5070c8);
+      color: white;
+      font-size: 0.88rem;
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.2s;
+      box-shadow: 0 4px 14px rgba(80,100,200,0.3);
+    }
+    .publish-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .publish-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    /* ギフトリスト */
+    .gift-list { display: flex; flex-direction: column; gap: 12px; }
+
+    .gift-row {
+      background: rgba(255,255,255,0.88);
+      border-radius: 16px;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border: 1.5px solid rgba(230,180,210,0.35);
+      transition: border-color 0.2s;
+    }
+    .gift-row.is-active { border-color: rgba(200,130,180,0.6); }
+
+    .row-emoji { font-size: 1.6rem; flex-shrink: 0; width: 36px; text-align: center; }
+
+    .row-info { flex: 1; min-width: 0; }
+    .row-title {
+      font-size: 0.92rem;
+      font-weight: 500;
+      color: #7a4a6a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .row-meta { font-size: 0.76rem; color: #b08090; margin-top: 2px; }
+
+    .row-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+
+    /* トグルスイッチ */
+    .toggle {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: #ddd;
+      border-radius: 24px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      left: 3px;
+      top: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.2s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+    .toggle input:checked + .toggle-slider { background: linear-gradient(135deg, #e890c0, #c870a8); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+    .edit-btn {
+      padding: 7px 16px;
+      border-radius: 10px;
+      border: 1.5px solid rgba(220,160,190,0.6);
+      background: white;
+      color: #c06090;
+      font-size: 0.8rem;
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .edit-btn:hover { background: #fde8f3; }
+
+    /* ============ 編集画面 ============ */
+    #editScreen {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 0 18px 80px;
+    }
+
+    .edit-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 20px 0 24px;
+    }
+
+    .back-btn {
+      background: none;
+      border: none;
+      font-size: 0.9rem;
+      color: #b08090;
+      cursor: pointer;
+      padding: 8px 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: color 0.2s;
+    }
+    .back-btn:hover { color: #c06090; }
+
+    .edit-header h2 {
+      font-family: 'Shippori Mincho', serif;
+      font-size: 1.15rem;
+      color: #c06090;
+    }
+
+    .type-tabs { display: flex; gap: 8px; margin-bottom: 6px; }
+    .type-tab {
+      padding: 8px 20px;
+      border-radius: 10px;
+      border: 1.5px solid rgba(220,160,190,0.5);
+      background: white;
+      color: #b08090;
+      font-size: 0.85rem;
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .type-tab.active {
+      background: #fde8f3;
+      border-color: #e090c0;
+      color: #c06090;
+      font-weight: 500;
+    }
+
+    #linksEditor { display: none; }
+    #linksEditor.visible { display: block; }
+
+    .link-entry {
+      background: #fff8fb;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 10px;
+      border: 1px solid rgba(220,160,190,0.2);
+    }
+
+    .link-entry .row { display: flex; gap: 8px; }
+    .link-entry .row input { flex: 1; }
+
+    .add-link-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 18px;
+      border-radius: 10px;
+      border: 1.5px dashed rgba(220,160,190,0.6);
+      background: transparent;
+      color: #c06090;
+      font-size: 0.85rem;
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 4px;
+    }
+    .add-link-btn:hover { background: #fff0f7; }
+
+    /* ============ 設定画面 ============ */
+    #settingsScreen {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 0 18px 80px;
+    }
+
+    .settings-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 20px 0 24px;
+    }
+
+    .section-title {
+      font-family: 'Shippori Mincho', serif;
+      font-size: 1rem;
+      color: #c06090;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .info-box {
+      background: #fff8fb;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 0.8rem;
+      color: #b08090;
+      line-height: 1.7;
+      margin-bottom: 16px;
+      border: 1px solid rgba(220,160,190,0.2);
+    }
+
+    .settings-save { margin-top: 20px; }
+
+    @media (max-width: 480px) {
+      #mainScreen, #editScreen, #settingsScreen { padding: 0 14px 60px; }
+      .row-actions { gap: 6px; }
+      .edit-btn { padding: 6px 12px; }
+      .header-actions { gap: 8px; }
+      .publish-btn { padding: 9px 14px; font-size: 0.82rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============ ログイン画面 ============ -->
+  <div id="loginScreen">
+    <div class="login-box card">
+      <span class="icon">🔑</span>
+      <h1>管理画面</h1>
+      <p>りりかのプレゼント箱</p>
+      <div class="field">
+        <input type="password" id="loginInput" placeholder="管理者パスワード" autocomplete="off">
+      </div>
+      <button class="btn-primary" style="width:100%" onclick="doLogin()">ログイン</button>
+      <p class="login-error" id="loginError">パスワードが違います</p>
+    </div>
+  </div>
+
+  <!-- ============ メイン画面 ============ -->
+  <div id="mainScreen" class="screen">
+    <div class="admin-header">
+      <h2>🎁 プレゼント管理</h2>
+      <div class="header-actions">
+        <button class="btn-secondary" onclick="showSettings()">⚙️</button>
+        <button class="publish-btn" id="publishBtn" onclick="publishToGitHub()">🚀 公開する</button>
+      </div>
+    </div>
+
+    <div class="gift-list" id="giftList"></div>
+
+    <div style="margin-top:20px;text-align:center">
+      <a href="index.html" target="_blank" style="font-size:0.82rem;color:#b08090;text-decoration:none;">
+        サイトを確認する →
+      </a>
+    </div>
+  </div>
+
+  <!-- ============ 編集画面 ============ -->
+  <div id="editScreen" class="screen">
+    <div class="edit-header">
+      <button class="back-btn" onclick="showMain()">← 戻る</button>
+      <h2 id="editTitle">プレゼントを編集</h2>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;gap:12px;margin-bottom:18px">
+        <div style="flex:0 0 80px">
+          <label>絵文字</label>
+          <input type="text" id="fEmoji" maxlength="4" style="text-align:center;font-size:1.4rem;">
+        </div>
+        <div style="flex:1">
+          <label>カテゴリタグ</label>
+          <input type="text" id="fTag" placeholder="例: プロンプト集">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>タイトル</label>
+        <input type="text" id="fTitle" placeholder="プレゼントのタイトル">
+      </div>
+
+      <div class="field">
+        <label>説明文</label>
+        <textarea id="fDesc" placeholder="どんな人向けか、何に使えるかを書きましょう" style="min-height:80px"></textarea>
+      </div>
+
+      <div class="field">
+        <label>パスワード</label>
+        <input type="text" id="fPassword" placeholder="フォロワーに伝えるパスワード">
+      </div>
+
+      <div class="field">
+        <label>コンテンツの種類</label>
+        <div class="type-tabs">
+          <button class="type-tab active" id="tabText" onclick="setType('text')">📝 テキスト</button>
+          <button class="type-tab" id="tabLinks" onclick="setType('links')">🔗 リンク集</button>
+        </div>
+      </div>
+
+      <!-- テキストコンテンツ -->
+      <div id="textEditor">
+        <div class="field">
+          <label>本文・プロンプト</label>
+          <textarea id="fContent" placeholder="プロンプトや本文をここに書きます" style="min-height:160px"></textarea>
+        </div>
+      </div>
+
+      <!-- リンクコンテンツ -->
+      <div id="linksEditor">
+        <label style="margin-bottom:10px">リンクリスト</label>
+        <div id="linksList"></div>
+        <button class="add-link-btn" onclick="addLink()">＋ リンクを追加</button>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <button class="btn-primary" style="flex:1" onclick="saveGift()">保存する</button>
+        <button class="btn-danger" onclick="clearGift()">リセット</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 設定画面 ============ -->
+  <div id="settingsScreen" class="screen">
+    <div class="settings-header">
+      <button class="back-btn" onclick="showMain()">← 戻る</button>
+      <h2 style="font-family:'Shippori Mincho',serif;font-size:1.15rem;color:#c06090">設定</h2>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="section-title">🔑 管理者パスワード</div>
+      <div class="field">
+        <label>現在のパスワード</label>
+        <input type="password" id="sCurrentPw" placeholder="現在のパスワード">
+      </div>
+      <div class="field">
+        <label>新しいパスワード</label>
+        <input type="password" id="sNewPw" placeholder="新しいパスワード">
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label>新しいパスワード（確認）</label>
+        <input type="password" id="sNewPw2" placeholder="もう一度入力">
+      </div>
+      <button class="btn-secondary" style="margin-top:16px" onclick="changePw()">パスワードを変更</button>
+    </div>
+
+    <div class="card">
+      <div class="section-title">🐙 GitHub設定（公開に必要）</div>
+      <div class="info-box">
+        GitHubの「公開する」ボタンを使うために必要な設定です。<br>
+        Personal Access Token は GitHub → Settings → Developer settings → Tokens から取得できます。<br>
+        権限: <strong>repo（Contents: write）</strong> が必要です。
+      </div>
+      <div class="field">
+        <label>GitHubユーザー名（オーナー）</label>
+        <input type="text" id="sGhOwner" placeholder="例: hinakira-bot">
+      </div>
+      <div class="field">
+        <label>リポジトリ名</label>
+        <input type="text" id="sGhRepo" placeholder="例: present-box">
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label>Personal Access Token</label>
+        <input type="password" id="sGhToken" placeholder="ghp_xxxxxxxxxxxx">
+      </div>
+      <button class="btn-secondary settings-save" onclick="saveSettings()">設定を保存</button>
+    </div>
+  </div>
+
+  <!-- トースト通知 -->
+  <div class="toast" id="toast"></div>
+
+  <script src="gifts-data.js"></script>
+  <script>
+    // ============ 状態 ============
+    const DEFAULT_PW = 'admin1234';
+    let currentEditId = null;
+    let drafts = JSON.parse(localStorage.getItem('admin_drafts') || 'null');
+
+    // 初回はGIFTS_DATAからドラフト初期化
+    if (!drafts) {
+      drafts = JSON.parse(JSON.stringify(GIFTS_DATA.gifts));
+      saveDrafts();
+    }
+
+    function saveDrafts() {
+      localStorage.setItem('admin_drafts', JSON.stringify(drafts));
+    }
+
+    function getAdminPw() {
+      return localStorage.getItem('admin_pw') || DEFAULT_PW;
+    }
+
+    // ============ ログイン ============
+    document.getElementById('loginInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') doLogin();
+    });
+
+    function doLogin() {
+      const val = document.getElementById('loginInput').value;
+      if (val === getAdminPw()) {
+        document.getElementById('loginScreen').style.display = 'none';
+        showMain();
+      } else {
+        const err = document.getElementById('loginError');
+        err.classList.add('show');
+        document.getElementById('loginInput').value = '';
+        setTimeout(() => err.classList.remove('show'), 3000);
+      }
+    }
+
+    // ============ メイン画面 ============
+    function showMain() {
+      hideAll();
+      document.getElementById('mainScreen').classList.add('active');
+      renderGiftList();
+    }
+
+    function renderGiftList() {
+      const list = document.getElementById('giftList');
+      list.innerHTML = '';
+      drafts.forEach(g => {
+        const row = document.createElement('div');
+        row.className = `gift-row ${g.active ? 'is-active' : ''}`;
+        row.innerHTML = `
+          <div class="row-emoji">${g.emoji}</div>
+          <div class="row-info">
+            <div class="row-title">${g.title || '（未設定）'}</div>
+            <div class="row-meta">${g.active ? '✅ 公開中' : '⬜ 非公開'}${g.tag ? '　' + g.tag : ''}</div>
+          </div>
+          <div class="row-actions">
+            <label class="toggle">
+              <input type="checkbox" ${g.active ? 'checked' : ''} onchange="toggleActive(${g.id}, this.checked)">
+              <span class="toggle-slider"></span>
+            </label>
+            <button class="edit-btn" onclick="showEdit(${g.id})">編集</button>
+          </div>`;
+        list.appendChild(row);
+      });
+    }
+
+    function toggleActive(id, val) {
+      drafts.find(g => g.id === id).active = val;
+      saveDrafts();
+      renderGiftList();
+    }
+
+    // ============ 編集画面 ============
+    function showEdit(id) {
+      currentEditId = id;
+      const g = drafts.find(g => g.id === id);
+      hideAll();
+      document.getElementById('editScreen').classList.add('active');
+      document.getElementById('editTitle').textContent = `プレゼント ${id} を編集`;
+
+      document.getElementById('fEmoji').value    = g.emoji;
+      document.getElementById('fTag').value      = g.tag;
+      document.getElementById('fTitle').value    = g.title;
+      document.getElementById('fDesc').value     = g.description;
+      document.getElementById('fPassword').value = g.password;
+      document.getElementById('fContent').value  = g.content;
+
+      setType(g.contentType || 'text', false);
+      renderLinks(g.links || []);
+    }
+
+    function setType(type, save = true) {
+      document.getElementById('textEditor').style.display  = type === 'text'  ? 'block' : 'none';
+      const le = document.getElementById('linksEditor');
+      le.style.display = type === 'links' ? 'block' : 'none';
+      document.getElementById('tabText').classList.toggle('active',  type === 'text');
+      document.getElementById('tabLinks').classList.toggle('active', type === 'links');
+      if (save && currentEditId) {
+        drafts.find(g => g.id === currentEditId).contentType = type;
+        saveDrafts();
+      }
+    }
+
+    function renderLinks(links) {
+      const container = document.getElementById('linksList');
+      container.innerHTML = '';
+      links.forEach((l, i) => {
+        const div = document.createElement('div');
+        div.className = 'link-entry';
+        div.innerHTML = `
+          <div class="row" style="margin-bottom:8px">
+            <input type="text" placeholder="絵文字" value="${escHtml(l.emoji||'')}" style="flex:0 0 60px;text-align:center" data-li="${i}" data-key="emoji">
+            <input type="text" placeholder="タイトル" value="${escHtml(l.title||'')}" data-li="${i}" data-key="title">
+          </div>
+          <div class="row" style="margin-bottom:8px">
+            <input type="text" placeholder="URL (https://...)" value="${escHtml(l.url||'')}" data-li="${i}" data-key="url">
+          </div>
+          <div class="row">
+            <input type="text" placeholder="説明（省略可）" value="${escHtml(l.desc||'')}" data-li="${i}" data-key="desc">
+            <button class="btn-danger" style="flex:0 0 auto" onclick="removeLink(${i})">削除</button>
+          </div>`;
+        container.appendChild(div);
+      });
+      // 変更イベント
+      container.querySelectorAll('input[data-li]').forEach(inp => {
+        inp.addEventListener('input', () => {
+          const i   = parseInt(inp.dataset.li);
+          const key = inp.dataset.key;
+          const g = drafts.find(g => g.id === currentEditId);
+          if (!g.links[i]) g.links[i] = {};
+          g.links[i][key] = inp.value;
+          saveDrafts();
+        });
+      });
+    }
+
+    function addLink() {
+      const g = drafts.find(g => g.id === currentEditId);
+      g.links = g.links || [];
+      g.links.push({ emoji: '🔗', title: '', url: '', desc: '' });
+      saveDrafts();
+      renderLinks(g.links);
+    }
+
+    function removeLink(i) {
+      const g = drafts.find(g => g.id === currentEditId);
+      g.links.splice(i, 1);
+      saveDrafts();
+      renderLinks(g.links);
+    }
+
+    function saveGift() {
+      const g = drafts.find(g => g.id === currentEditId);
+      g.emoji       = document.getElementById('fEmoji').value.trim()    || '🎁';
+      g.tag         = document.getElementById('fTag').value.trim();
+      g.title       = document.getElementById('fTitle').value.trim();
+      g.description = document.getElementById('fDesc').value.trim();
+      g.password    = document.getElementById('fPassword').value.trim();
+      g.content     = document.getElementById('fContent').value;
+      saveDrafts();
+      showToast('💾 保存しました！');
+      showMain();
+    }
+
+    function clearGift() {
+      if (!confirm('このプレゼントの内容をリセットしますか？')) return;
+      const g = drafts.find(g => g.id === currentEditId);
+      g.active = false; g.emoji = '🎁'; g.tag = ''; g.title = '';
+      g.description = ''; g.password = ''; g.contentType = 'text';
+      g.content = ''; g.links = [];
+      saveDrafts();
+      showMain();
+    }
+
+    // ============ 設定画面 ============
+    function showSettings() {
+      hideAll();
+      document.getElementById('settingsScreen').classList.add('active');
+      document.getElementById('sGhOwner').value = localStorage.getItem('gh_owner') || '';
+      document.getElementById('sGhRepo').value  = localStorage.getItem('gh_repo')  || '';
+      document.getElementById('sGhToken').value = localStorage.getItem('gh_token') || '';
+    }
+
+    function saveSettings() {
+      localStorage.setItem('gh_owner', document.getElementById('sGhOwner').value.trim());
+      localStorage.setItem('gh_repo',  document.getElementById('sGhRepo').value.trim());
+      localStorage.setItem('gh_token', document.getElementById('sGhToken').value.trim());
+      showToast('✅ 設定を保存しました');
+    }
+
+    function changePw() {
+      const cur  = document.getElementById('sCurrentPw').value;
+      const nw   = document.getElementById('sNewPw').value;
+      const nw2  = document.getElementById('sNewPw2').value;
+      if (cur !== getAdminPw())  { showToast('❌ 現在のパスワードが違います'); return; }
+      if (!nw)                   { showToast('❌ 新しいパスワードを入力してください'); return; }
+      if (nw !== nw2)            { showToast('❌ 新しいパスワードが一致しません'); return; }
+      localStorage.setItem('admin_pw', nw);
+      document.getElementById('sCurrentPw').value = '';
+      document.getElementById('sNewPw').value     = '';
+      document.getElementById('sNewPw2').value    = '';
+      showToast('✅ パスワードを変更しました');
+    }
+
+    // ============ GitHub公開 ============
+    async function publishToGitHub() {
+      const owner = localStorage.getItem('gh_owner');
+      const repo  = localStorage.getItem('gh_repo');
+      const token = localStorage.getItem('gh_token');
+
+      if (!owner || !repo || !token) {
+        showToast('⚙️ まず設定からGitHub情報を登録してください');
+        showSettings();
+        return;
+      }
+
+      const btn = document.getElementById('publishBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ 公開中...';
+
+      try {
+        // 現在のファイルのSHAを取得
+        const getRes = await fetch(
+          `https://api.github.com/repos/${owner}/${repo}/contents/gifts-data.js`,
+          { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' } }
+        );
+
+        if (!getRes.ok) throw new Error(`ファイル取得失敗: ${getRes.status}`);
+        const fileInfo = await getRes.json();
+
+        // 新しいgifts-data.jsを生成
+        const newContent = generateGiftsDataJs();
+        const encoded = btoa(unescape(encodeURIComponent(newContent)));
+
+        // ファイルを更新
+        const putRes = await fetch(
+          `https://api.github.com/repos/${owner}/${repo}/contents/gifts-data.js`,
+          {
+            method: 'PUT',
+            headers: {
+              'Authorization': `token ${token}`,
+              'Accept': 'application/vnd.github.v3+json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              message: 'プレゼントデータを更新',
+              content: encoded,
+              sha: fileInfo.sha
+            })
+          }
+        );
+
+        if (!putRes.ok) {
+          const err = await putRes.json();
+          throw new Error(err.message || `更新失敗: ${putRes.status}`);
+        }
+
+        showToast('🚀 GitHubに公開しました！Vercelが自動デプロイします');
+      } catch (e) {
+        showToast('❌ ' + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🚀 公開する';
+      }
+    }
+
+    function generateGiftsDataJs() {
+      const lines = drafts.map(g => {
+        const links = (g.links || []).map(l =>
+          `      { emoji: ${JSON.stringify(l.emoji||'')}, title: ${JSON.stringify(l.title||'')}, url: ${JSON.stringify(l.url||'')}, desc: ${JSON.stringify(l.desc||'')} }`
+        ).join(',\n');
+        return `    {
+      id: ${g.id},
+      active: ${g.active},
+      emoji: ${JSON.stringify(g.emoji)},
+      tag: ${JSON.stringify(g.tag)},
+      title: ${JSON.stringify(g.title)},
+      description: ${JSON.stringify(g.description)},
+      password: ${JSON.stringify(g.password)},
+      contentType: ${JSON.stringify(g.contentType || 'text')},
+      content: ${JSON.stringify(g.content)},
+      links: [${links ? '\n' + links + '\n    ' : ''}]
+    }`;
+      }).join(',\n');
+
+      return `const GIFTS_DATA = {\n  gifts: [\n${lines}\n  ]\n};\n`;
+    }
+
+    // ============ ユーティリティ ============
+    function hideAll() {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    function escHtml(str) {
+      return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+  </script>
+
+</body>
+</html>

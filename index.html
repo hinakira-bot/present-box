@@ -6,11 +6,7 @@
   <title>りりかのプレゼント箱</title>
   <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@300;400;500&family=Shippori+Mincho:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Zen Kaku Gothic New', sans-serif;
@@ -19,7 +15,6 @@
       color: #5a4a5a;
     }
 
-    /* ヘッダー */
     header {
       text-align: center;
       padding: 56px 24px 40px;
@@ -29,7 +24,7 @@
       font-size: 48px;
       display: block;
       margin-bottom: 16px;
-      filter: drop-shadow(0 2px 8px rgba(220, 120, 160, 0.3));
+      filter: drop-shadow(0 2px 8px rgba(220,120,160,0.3));
     }
 
     header h1 {
@@ -49,7 +44,6 @@
       margin: 0 auto;
     }
 
-    /* 仕切り */
     .divider {
       width: 60px;
       height: 2px;
@@ -57,7 +51,6 @@
       margin: 24px auto 0;
     }
 
-    /* カードグリッド */
     main {
       max-width: 960px;
       margin: 0 auto;
@@ -70,13 +63,12 @@
       gap: 28px;
     }
 
-    /* プレゼントカード */
     .gift-card {
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255,255,255,0.85);
       border-radius: 20px;
       padding: 32px 28px;
-      box-shadow: 0 4px 24px rgba(200, 120, 160, 0.1);
-      border: 1px solid rgba(230, 180, 210, 0.4);
+      box-shadow: 0 4px 24px rgba(200,120,160,0.1);
+      border: 1px solid rgba(230,180,210,0.4);
       text-decoration: none;
       color: inherit;
       display: flex;
@@ -84,24 +76,15 @@
       align-items: center;
       text-align: center;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
-      cursor: pointer;
       backdrop-filter: blur(4px);
     }
 
     .gift-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 8px 32px rgba(200, 120, 160, 0.2);
+      box-shadow: 0 8px 32px rgba(200,120,160,0.2);
     }
 
-    .gift-card:active {
-      transform: translateY(-2px);
-    }
-
-    .card-emoji {
-      font-size: 40px;
-      margin-bottom: 16px;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-    }
+    .card-emoji { font-size: 40px; margin-bottom: 16px; }
 
     .card-tag {
       font-size: 0.72rem;
@@ -128,6 +111,7 @@
       color: #9a7a8a;
       line-height: 1.7;
       margin-bottom: 20px;
+      flex: 1;
     }
 
     .card-lock {
@@ -139,38 +123,52 @@
       background: #fff0f7;
       border-radius: 20px;
       padding: 6px 16px;
-      border: 1px solid rgba(220, 160, 190, 0.4);
+      border: 1px solid rgba(220,160,190,0.4);
     }
 
-    .card-lock span {
+    .empty-state {
+      text-align: center;
+      padding: 60px 24px;
+      color: #c0a0b0;
       font-size: 0.9rem;
+      line-height: 1.8;
     }
 
-    /* フッター */
+    .empty-state span { font-size: 2.5rem; display: block; margin-bottom: 12px; }
+
+    .admin-link {
+      position: fixed;
+      top: 14px;
+      right: 16px;
+      font-size: 0.72rem;
+      color: rgba(180,140,160,0.5);
+      text-decoration: none;
+      padding: 5px 10px;
+      border-radius: 20px;
+      transition: color 0.2s, background 0.2s;
+      z-index: 100;
+    }
+    .admin-link:hover {
+      color: #c06090;
+      background: rgba(255,255,255,0.7);
+    }
+
     footer {
       text-align: center;
       padding: 32px 24px;
       font-size: 0.78rem;
       color: #c0a0b0;
-      letter-spacing: 0.05em;
     }
 
-    /* スマホ対応 */
     @media (max-width: 480px) {
-      header {
-        padding: 40px 20px 32px;
-      }
-      main {
-        padding: 28px 16px 60px;
-      }
-      .grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-      }
+      header { padding: 40px 20px 32px; }
+      main { padding: 28px 16px 60px; }
+      .grid { grid-template-columns: 1fr; gap: 20px; }
     }
   </style>
 </head>
 <body>
+  <a class="admin-link" href="admin.html">管理</a>
 
   <header>
     <span class="header-icon">🎁</span>
@@ -180,32 +178,36 @@
   </header>
 
   <main>
-    <div class="grid">
-
-      <!-- プレゼント1 -->
-      <a class="gift-card" href="gift-1.html">
-        <div class="card-emoji">✨</div>
-        <div class="card-tag">プロンプト集</div>
-        <div class="card-title">タイトルをここに入力</div>
-        <div class="card-desc">プレゼントの説明文をここに書きます。どんな人に向けたもので、何に使えるかを伝えると◎</div>
-        <div class="card-lock"><span>🔒</span> パスワードで受け取る</div>
-      </a>
-
-      <!-- プレゼント2以降はここに追加 -->
-      <!-- 例：
-      <a class="gift-card" href="gift-2.html">
-        <div class="card-emoji">📝</div>
-        <div class="card-tag">ツールリンク</div>
-        <div class="card-title">タイトル</div>
-        <div class="card-desc">説明文</div>
-        <div class="card-lock"><span>🔒</span> パスワードで受け取る</div>
-      </a>
-      -->
-
-    </div>
+    <div class="grid" id="giftGrid"></div>
   </main>
 
   <footer>© りりか</footer>
 
+  <script src="gifts-data.js"></script>
+  <script>
+    const grid = document.getElementById('giftGrid');
+    const active = GIFTS_DATA.gifts.filter(g => g.active);
+
+    if (active.length === 0) {
+      grid.innerHTML = `
+        <div class="empty-state" style="grid-column:1/-1">
+          <span>🎁</span>
+          ただいま準備中です。<br>もうしばらくお待ちください。
+        </div>`;
+    } else {
+      active.forEach(g => {
+        const a = document.createElement('a');
+        a.className = 'gift-card';
+        a.href = `gift.html?id=${g.id}`;
+        a.innerHTML = `
+          <div class="card-emoji">${g.emoji}</div>
+          ${g.tag ? `<div class="card-tag">${g.tag}</div>` : ''}
+          <div class="card-title">${g.title}</div>
+          <div class="card-desc">${g.description}</div>
+          <div class="card-lock"><span>🔒</span> パスワードで受け取る</div>`;
+        grid.appendChild(a);
+      });
+    }
+  </script>
 </body>
 </html>

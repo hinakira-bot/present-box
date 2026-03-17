@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>プレゼント - りりかのプレゼント箱</title>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@300;400;500&family=Shippori+Mincho:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      background: linear-gradient(135deg, #fff5f8 0%, #fdf0f8 50%, #f5f0ff 100%);
+      min-height: 100vh;
+      color: #5a4a5a;
+    }
+
+    nav { padding: 20px 28px; }
+
+    nav a {
+      font-size: 0.85rem;
+      color: #b08090;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 0;
+      transition: color 0.2s;
+    }
+    nav a:hover { color: #c06090; }
+
+    .container {
+      max-width: 560px;
+      margin: 0 auto;
+      padding: 8px 20px 80px;
+    }
+
+    /* プレゼント情報 */
+    .gift-info {
+      background: rgba(255,255,255,0.85);
+      border-radius: 24px;
+      padding: 36px 32px;
+      text-align: center;
+      box-shadow: 0 4px 32px rgba(200,120,160,0.12);
+      border: 1px solid rgba(230,180,210,0.4);
+      backdrop-filter: blur(4px);
+      margin-bottom: 20px;
+    }
+
+    .gift-emoji { font-size: 52px; display: block; margin-bottom: 18px; }
+
+    .gift-tag {
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: #c06090;
+      background: #fde8f3;
+      border-radius: 20px;
+      padding: 4px 14px;
+      display: inline-block;
+      margin-bottom: 14px;
+    }
+
+    .gift-title {
+      font-family: 'Shippori Mincho', serif;
+      font-size: 1.45rem;
+      font-weight: 500;
+      color: #7a4a6a;
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+
+    .divider {
+      width: 40px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #e8a0c0, transparent);
+      margin: 16px auto;
+    }
+
+    .gift-desc {
+      font-size: 0.88rem;
+      color: #9a7a8a;
+      line-height: 1.9;
+    }
+
+    /* パスワードセクション */
+    .password-section {
+      background: rgba(255,255,255,0.85);
+      border-radius: 24px;
+      padding: 32px 28px;
+      text-align: center;
+      box-shadow: 0 4px 32px rgba(200,120,160,0.12);
+      border: 1px solid rgba(230,180,210,0.4);
+      backdrop-filter: blur(4px);
+    }
+
+    .lock-icon { font-size: 34px; display: block; margin-bottom: 14px; }
+
+    .password-section h2 {
+      font-family: 'Shippori Mincho', serif;
+      font-size: 1.05rem;
+      color: #7a4a6a;
+      margin-bottom: 8px;
+    }
+
+    .password-section p {
+      font-size: 0.82rem;
+      color: #b08090;
+      margin-bottom: 22px;
+      line-height: 1.7;
+    }
+
+    .input-wrap {
+      position: relative;
+      max-width: 300px;
+      margin: 0 auto 14px;
+    }
+
+    .password-input {
+      width: 100%;
+      padding: 14px 48px 14px 20px;
+      border-radius: 14px;
+      border: 1.5px solid rgba(220,160,190,0.6);
+      background: #fff8fb;
+      font-size: 1rem;
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      color: #5a4a5a;
+      outline: none;
+      text-align: center;
+      letter-spacing: 0.1em;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .password-input:focus {
+      border-color: #e090c0;
+      box-shadow: 0 0 0 3px rgba(220,120,170,0.12);
+    }
+
+    .password-input::placeholder {
+      letter-spacing: 0.05em;
+      color: #d0b0c0;
+    }
+
+    .toggle-btn {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.1rem;
+      opacity: 0.5;
+      padding: 4px;
+    }
+
+    .submit-btn {
+      display: block;
+      width: 100%;
+      max-width: 300px;
+      margin: 0 auto;
+      padding: 14px;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(135deg, #e890c0, #c870a8);
+      color: white;
+      font-size: 0.95rem;
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.2s;
+      box-shadow: 0 4px 16px rgba(200,100,150,0.3);
+    }
+
+    .submit-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .submit-btn:active { transform: translateY(0); }
+
+    .error-msg {
+      font-size: 0.82rem;
+      color: #e07090;
+      margin-top: 12px;
+      min-height: 1.2em;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .error-msg.show { opacity: 1; }
+
+    /* プレゼント中身 */
+    .gift-content {
+      display: none;
+      margin-top: 20px;
+      animation: fadeIn 0.4s ease;
+    }
+    .gift-content.open { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .content-box {
+      background: rgba(255,255,255,0.9);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 4px 32px rgba(200,120,160,0.12);
+      border: 1px solid rgba(230,180,210,0.4);
+    }
+
+    .content-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .content-header span { font-size: 1.2rem; }
+    .content-header h3 {
+      font-family: 'Shippori Mincho', serif;
+      font-size: 1rem;
+      color: #c06090;
+    }
+
+    .text-content {
+      background: #fff8fb;
+      border-radius: 12px;
+      padding: 18px;
+      font-size: 0.88rem;
+      line-height: 2;
+      color: #6a5a6a;
+      white-space: pre-wrap;
+      word-break: break-all;
+      border: 1px solid rgba(220,160,190,0.2);
+      margin-bottom: 14px;
+    }
+
+    .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 22px;
+      border-radius: 12px;
+      border: 1.5px solid rgba(220,160,190,0.6);
+      background: white;
+      color: #c06090;
+      font-size: 0.85rem;
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .copy-btn:hover { background: #fde8f3; border-color: #e090c0; }
+
+    .link-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 18px;
+      border-radius: 14px;
+      background: #fff8fb;
+      border: 1px solid rgba(220,160,190,0.2);
+      text-decoration: none;
+      color: inherit;
+      margin-bottom: 10px;
+      transition: all 0.2s;
+    }
+    .link-item:hover { background: #fde8f3; transform: translateX(4px); }
+    .link-item:last-child { margin-bottom: 0; }
+
+    .link-emoji { font-size: 1.4rem; flex-shrink: 0; }
+    .link-text { flex: 1; }
+    .link-text strong { display: block; font-size: 0.9rem; color: #7a4a6a; margin-bottom: 2px; }
+    .link-text small { font-size: 0.78rem; color: #b08090; }
+    .link-arrow { font-size: 0.9rem; color: #d0a0b8; }
+
+    /* エラー画面 */
+    .error-screen {
+      text-align: center;
+      padding: 80px 24px;
+      color: #c0a0b0;
+    }
+    .error-screen span { font-size: 3rem; display: block; margin-bottom: 16px; }
+
+    .admin-link {
+      position: fixed;
+      top: 14px;
+      right: 16px;
+      font-size: 0.72rem;
+      color: rgba(180,140,160,0.5);
+      text-decoration: none;
+      padding: 5px 10px;
+      border-radius: 20px;
+      transition: color 0.2s, background 0.2s;
+      z-index: 100;
+    }
+    .admin-link:hover {
+      color: #c06090;
+      background: rgba(255,255,255,0.7);
+    }
+
+    footer {
+      text-align: center;
+      padding: 32px 24px;
+      font-size: 0.78rem;
+      color: #c0a0b0;
+    }
+
+    @media (max-width: 480px) {
+      .container { padding: 4px 14px 60px; }
+      .gift-info, .password-section, .content-box { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <a class="admin-link" href="admin.html">管理</a>
+
+  <nav>
+    <a href="index.html">← プレゼント箱に戻る</a>
+  </nav>
+
+  <div class="container" id="mainContainer">
+    <!-- JSで動的に生成 -->
+  </div>
+
+  <footer>© りりか</footer>
+
+  <script src="gifts-data.js"></script>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const id = parseInt(params.get('id'), 10);
+    const gift = GIFTS_DATA.gifts.find(g => g.id === id && g.active);
+    const container = document.getElementById('mainContainer');
+
+    if (!gift) {
+      container.innerHTML = `
+        <div class="error-screen">
+          <span>🎁</span>
+          このプレゼントは見つかりませんでした。<br>
+          <a href="index.html" style="color:#c06090;margin-top:16px;display:inline-block;">プレゼント箱に戻る</a>
+        </div>`;
+    } else {
+      document.title = `${gift.title} - りりかのプレゼント箱`;
+
+      // コンテンツHTML
+      let contentHTML = '';
+      if (gift.contentType === 'text') {
+        contentHTML = `
+          <div class="text-content" id="promptText">${escHtml(gift.content)}</div>
+          <button class="copy-btn" id="copyBtn" onclick="copyText()">
+            <span>📋</span> テキストをコピー
+          </button>`;
+      } else {
+        contentHTML = gift.links.map(link => `
+          <a class="link-item" href="${escHtml(link.url)}" target="_blank" rel="noopener">
+            <span class="link-emoji">${link.emoji || '🔗'}</span>
+            <div class="link-text">
+              <strong>${escHtml(link.title)}</strong>
+              ${link.desc ? `<small>${escHtml(link.desc)}</small>` : ''}
+            </div>
+            <span class="link-arrow">→</span>
+          </a>`).join('');
+      }
+
+      container.innerHTML = `
+        <div class="gift-info">
+          <span class="gift-emoji">${gift.emoji}</span>
+          ${gift.tag ? `<div class="gift-tag">${escHtml(gift.tag)}</div>` : ''}
+          <h1 class="gift-title">${escHtml(gift.title)}</h1>
+          <div class="divider"></div>
+          <p class="gift-desc">${escHtml(gift.description).replace(/\n/g,'<br>')}</p>
+        </div>
+
+        <div class="password-section" id="passwordSection">
+          <span class="lock-icon">🔒</span>
+          <h2>パスワードを入力してね</h2>
+          <p>パスワードはSNSやライブ配信でお知らせしています。</p>
+          <div class="input-wrap">
+            <input type="password" class="password-input" id="passwordInput"
+              placeholder="パスワードを入力" autocomplete="off">
+            <button class="toggle-btn" id="toggleBtn" onclick="togglePw()" title="表示切り替え">👁</button>
+          </div>
+          <button class="submit-btn" onclick="checkPw()">受け取る 🎁</button>
+          <p class="error-msg" id="errorMsg">パスワードが違います</p>
+        </div>
+
+        <div class="gift-content" id="giftContent">
+          <div class="content-box">
+            <div class="content-header">
+              <span>🎀</span>
+              <h3>プレゼントをどうぞ</h3>
+            </div>
+            ${contentHTML}
+          </div>
+        </div>`;
+
+      // Enterキー
+      document.getElementById('passwordInput').addEventListener('keydown', e => {
+        if (e.key === 'Enter') checkPw();
+      });
+
+      // セッション復元
+      if (sessionStorage.getItem(`gift_${id}_unlocked`) === 'true') unlock();
+    }
+
+    function checkPw() {
+      const val = document.getElementById('passwordInput').value.trim();
+      if (val === gift.password) {
+        unlock();
+        sessionStorage.setItem(`gift_${id}_unlocked`, 'true');
+      } else {
+        const err = document.getElementById('errorMsg');
+        err.classList.add('show');
+        document.getElementById('passwordInput').value = '';
+        document.getElementById('passwordInput').focus();
+        setTimeout(() => err.classList.remove('show'), 3000);
+      }
+    }
+
+    function unlock() {
+      document.getElementById('passwordSection').style.display = 'none';
+      const gc = document.getElementById('giftContent');
+      gc.classList.add('open');
+    }
+
+    function togglePw() {
+      const inp = document.getElementById('passwordInput');
+      const btn = document.getElementById('toggleBtn');
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+      btn.textContent = inp.type === 'password' ? '👁' : '🙈';
+    }
+
+    function copyText() {
+      const text = document.getElementById('promptText').innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.innerHTML = '<span>✅</span> コピーしました！';
+        setTimeout(() => { btn.innerHTML = '<span>📋</span> テキストをコピー'; }, 2500);
+      });
+    }
+
+    function escHtml(str) {
+      return String(str)
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;');
+    }
+  </script>
+
+</body>
+</html>

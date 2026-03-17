@@ -490,6 +490,7 @@
         <div class="type-tabs">
           <button class="type-tab active" id="tabText" onclick="setType('text')">📝 テキスト</button>
           <button class="type-tab" id="tabLinks" onclick="setType('links')">🔗 リンク集</button>
+          <button class="type-tab" id="tabPrompts" onclick="setType('prompts')">✨ プロンプト集</button>
         </div>
       </div>
 
@@ -498,6 +499,19 @@
         <div class="field">
           <label>本文・プロンプト</label>
           <textarea id="fContent" placeholder="プロンプトや本文をここに書きます" style="min-height:160px"></textarea>
+        </div>
+      </div>
+
+      <!-- プロンプト集コンテンツ -->
+      <div id="promptsEditor" style="display:none">
+        <div class="field">
+          <label>プロンプト集（#01〜形式で入力）</label>
+          <textarea id="fPromptsContent" placeholder="#01 タイトル&#10;プロンプト本文&#10;&#10;#02 タイトル&#10;プロンプト本文" style="min-height:240px;font-size:0.82rem"></textarea>
+          <div style="font-size:0.75rem;color:#b08090;margin-top:6px;line-height:1.6">
+            🍼 PART 1｜セクション名 でパート区切り<br>
+            ▶ サブタイトル でグループ分け<br>
+            #01 タイトル / 本文 でプロンプトを入力
+          </div>
         </div>
       </div>
 
@@ -570,9 +584,16 @@
     // ============ 状態 ============
     const DEFAULT_PW = 'hinakira20260317';
     let currentEditId = null;
-    let drafts = JSON.parse(localStorage.getItem('admin_drafts') || 'null');
 
-    // 初回はGIFTS_DATAからドラフト初期化
+    // gifts-data.jsのバージョンと照合して古いlocalStorageを破棄
+    const REMOTE_VERSION = GIFTS_DATA.gifts.map(g => g.id + ':' + g.title + ':' + g.contentType).join('|');
+    const savedVersion = localStorage.getItem('admin_drafts_version');
+    if (savedVersion !== REMOTE_VERSION) {
+      localStorage.removeItem('admin_drafts');
+      localStorage.setItem('admin_drafts_version', REMOTE_VERSION);
+    }
+
+    let drafts = JSON.parse(localStorage.getItem('admin_drafts') || 'null');
     if (!drafts) {
       drafts = JSON.parse(JSON.stringify(GIFTS_DATA.gifts));
       saveDrafts();
@@ -653,18 +674,20 @@
       document.getElementById('fTitle').value    = g.title;
       document.getElementById('fDesc').value     = g.description;
       document.getElementById('fPassword').value = g.password;
-      document.getElementById('fContent').value  = g.content;
+      document.getElementById('fContent').value         = g.content;
+      document.getElementById('fPromptsContent').value  = g.content;
 
       setType(g.contentType || 'text', false);
       renderLinks(g.links || []);
     }
 
     function setType(type, save = true) {
-      document.getElementById('textEditor').style.display  = type === 'text'  ? 'block' : 'none';
-      const le = document.getElementById('linksEditor');
-      le.style.display = type === 'links' ? 'block' : 'none';
-      document.getElementById('tabText').classList.toggle('active',  type === 'text');
-      document.getElementById('tabLinks').classList.toggle('active', type === 'links');
+      document.getElementById('textEditor').style.display    = type === 'text'    ? 'block' : 'none';
+      document.getElementById('linksEditor').style.display   = type === 'links'   ? 'block' : 'none';
+      document.getElementById('promptsEditor').style.display = type === 'prompts' ? 'block' : 'none';
+      document.getElementById('tabText').classList.toggle('active',    type === 'text');
+      document.getElementById('tabLinks').classList.toggle('active',   type === 'links');
+      document.getElementById('tabPrompts').classList.toggle('active', type === 'prompts');
       if (save && currentEditId) {
         drafts.find(g => g.id === currentEditId).contentType = type;
         saveDrafts();
@@ -726,7 +749,9 @@
       g.title       = document.getElementById('fTitle').value.trim();
       g.description = document.getElementById('fDesc').value.trim();
       g.password    = document.getElementById('fPassword').value.trim();
-      g.content     = document.getElementById('fContent').value;
+      g.content = g.contentType === 'prompts'
+        ? document.getElementById('fPromptsContent').value
+        : document.getElementById('fContent').value;
       saveDrafts();
       showToast('💾 保存しました！');
       showMain();

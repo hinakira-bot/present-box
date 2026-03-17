@@ -536,23 +536,6 @@
       <h2 style="font-family:'Shippori Mincho',serif;font-size:1.15rem;color:#c06090">設定</h2>
     </div>
 
-    <div class="card" style="margin-bottom:16px">
-      <div class="section-title">🔑 管理者パスワード</div>
-      <div class="field">
-        <label>現在のパスワード</label>
-        <input type="password" id="sCurrentPw" placeholder="現在のパスワード">
-      </div>
-      <div class="field">
-        <label>新しいパスワード</label>
-        <input type="password" id="sNewPw" placeholder="新しいパスワード">
-      </div>
-      <div class="field" style="margin-bottom:0">
-        <label>新しいパスワード（確認）</label>
-        <input type="password" id="sNewPw2" placeholder="もう一度入力">
-      </div>
-      <button class="btn-secondary" style="margin-top:16px" onclick="changePw()">パスワードを変更</button>
-    </div>
-
     <div class="card">
       <div class="section-title">🐙 GitHub設定（公開に必要）</div>
       <div class="info-box">
@@ -603,10 +586,6 @@
       localStorage.setItem('admin_drafts', JSON.stringify(drafts));
     }
 
-    function getAdminPw() {
-      return localStorage.getItem('admin_pw') || DEFAULT_PW;
-    }
-
     // ============ ログイン ============
     document.getElementById('loginInput').addEventListener('keydown', e => {
       if (e.key === 'Enter') doLogin();
@@ -614,7 +593,7 @@
 
     function doLogin() {
       const val = document.getElementById('loginInput').value;
-      if (val === getAdminPw()) {
+      if (val === DEFAULT_PW) {
         document.getElementById('loginScreen').style.display = 'none';
         showMain();
       } else {
@@ -781,20 +760,6 @@
       localStorage.setItem('gh_repo',  document.getElementById('sGhRepo').value.trim());
       localStorage.setItem('gh_token', document.getElementById('sGhToken').value.trim());
       showToast('✅ 設定を保存しました');
-    }
-
-    function changePw() {
-      const cur  = document.getElementById('sCurrentPw').value;
-      const nw   = document.getElementById('sNewPw').value;
-      const nw2  = document.getElementById('sNewPw2').value;
-      if (cur !== getAdminPw())  { showToast('❌ 現在のパスワードが違います'); return; }
-      if (!nw)                   { showToast('❌ 新しいパスワードを入力してください'); return; }
-      if (nw !== nw2)            { showToast('❌ 新しいパスワードが一致しません'); return; }
-      localStorage.setItem('admin_pw', nw);
-      document.getElementById('sCurrentPw').value = '';
-      document.getElementById('sNewPw').value     = '';
-      document.getElementById('sNewPw2').value    = '';
-      showToast('✅ パスワードを変更しました');
     }
 
     // ============ GitHub公開 ============

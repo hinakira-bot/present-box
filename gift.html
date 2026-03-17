@@ -270,6 +270,82 @@
     .link-text small { font-size: 0.78rem; color: #b08090; }
     .link-arrow { font-size: 0.9rem; color: #d0a0b8; }
 
+    /* ============ プロンプト集 ============ */
+    .prompts-wrap { }
+
+    .part-header {
+      font-family: 'Shippori Mincho', serif;
+      font-size: 0.95rem;
+      color: #c06090;
+      background: linear-gradient(135deg, #fde8f3, #f5e8ff);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin: 24px 0 10px;
+      font-weight: 500;
+    }
+
+    .sub-header {
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: #a07090;
+      margin: 16px 0 8px 4px;
+    }
+
+    .prompt-card {
+      background: #fff8fb;
+      border-radius: 12px;
+      padding: 14px 14px 12px;
+      margin-bottom: 8px;
+      border: 1px solid rgba(220,160,190,0.2);
+    }
+
+    .prompt-card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .prompt-num {
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: #c06090;
+      background: #fde8f3;
+      border-radius: 6px;
+      padding: 3px 7px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .prompt-title {
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: #7a4a6a;
+      flex: 1;
+      line-height: 1.5;
+    }
+
+    .prompt-copy {
+      background: none;
+      border: 1px solid rgba(220,160,190,0.4);
+      border-radius: 8px;
+      padding: 4px 10px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+      transition: background 0.2s;
+      color: #c06090;
+      line-height: 1;
+    }
+    .prompt-copy:hover { background: #fde8f3; }
+
+    .prompt-body {
+      font-size: 0.8rem;
+      color: #9a7a8a;
+      line-height: 1.85;
+      padding-left: 4px;
+    }
+
     /* エラー画面 */
     .error-screen {
       text-align: center;
@@ -341,7 +417,9 @@
 
       // コンテンツHTML
       let contentHTML = '';
-      if (gift.contentType === 'text') {
+      if (gift.contentType === 'prompts') {
+        contentHTML = renderPrompts(gift.content);
+      } else if (gift.contentType === 'text') {
         contentHTML = `
           <div class="text-content" id="promptText">${escHtml(gift.content)}</div>
           <button class="copy-btn" id="copyBtn" onclick="copyText()">
@@ -433,6 +511,58 @@
         const btn = document.getElementById('copyBtn');
         btn.innerHTML = '<span>✅</span> コピーしました！';
         setTimeout(() => { btn.innerHTML = '<span>📋</span> テキストをコピー'; }, 2500);
+      });
+    }
+
+    // ============ プロンプト描画 ============
+    function renderPrompts(text) {
+      const lines = text.split('\n');
+      let html = '<div class="prompts-wrap">';
+      let cur = null;
+
+      function flushPrompt() {
+        if (!cur) return;
+        const body = cur.body.trim();
+        const copyText = `${cur.num} ${cur.title}\n${body}`;
+        const btnId = 'btn_' + cur.num.replace('#','');
+        html += `<div class="prompt-card">
+          <div class="prompt-card-header">
+            <span class="prompt-num">${escHtml(cur.num)}</span>
+            <span class="prompt-title">${escHtml(cur.title)}</span>
+            <button class="prompt-copy" id="${btnId}" onclick="copyPrompt(this,${JSON.stringify(copyText)})">📋 コピー</button>
+          </div>
+          <div class="prompt-body">${escHtml(body).replace(/\n/g,'<br>')}</div>
+        </div>`;
+        cur = null;
+      }
+
+      for (const line of lines) {
+        const t = line.trim();
+        if (!t) { if (cur) cur.body += '\n'; continue; }
+
+        if (/^[🍼💑🍳].+PART/u.test(t)) {
+          flushPrompt();
+          html += `<div class="part-header">${escHtml(t)}</div>`;
+        } else if (t.startsWith('▶')) {
+          flushPrompt();
+          html += `<div class="sub-header">${escHtml(t)}</div>`;
+        } else if (/^#\d+/.test(t)) {
+          flushPrompt();
+          const m = t.match(/^(#\d+)\s*(.*)/);
+          cur = { num: m[1], title: m[2], body: '' };
+        } else {
+          if (cur) cur.body += (cur.body ? '\n' : '') + line;
+        }
+      }
+      flushPrompt();
+      html += '</div>';
+      return html;
+    }
+
+    function copyPrompt(btn, text) {
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = '✅ コピー済み';
+        setTimeout(() => { btn.textContent = '📋 コピー'; }, 2500);
       });
     }
 

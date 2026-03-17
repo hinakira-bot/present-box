@@ -424,10 +424,13 @@
       <span class="icon">🔑</span>
       <h1>管理画面</h1>
       <p>りりかのプレゼント箱</p>
-      <div class="field">
-        <input type="password" id="loginInput" placeholder="管理者パスワード" autocomplete="off">
-      </div>
-      <button class="btn-primary" style="width:100%" onclick="doLogin()">ログイン</button>
+      <form onsubmit="doLogin(); return false;" autocomplete="on">
+        <input type="text" name="username" value="admin" autocomplete="username" style="display:none">
+        <div class="field">
+          <input type="password" id="loginInput" name="password" placeholder="管理者パスワード" autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn-primary" style="width:100%">ログイン</button>
+      </form>
       <p class="login-error" id="loginError">パスワードが違います</p>
     </div>
   </div>
@@ -587,9 +590,6 @@
     }
 
     // ============ ログイン ============
-    document.getElementById('loginInput').addEventListener('keydown', e => {
-      if (e.key === 'Enter') doLogin();
-    });
 
     function doLogin() {
       const val = document.getElementById('loginInput').value;

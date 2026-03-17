@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>りりかのプレゼント箱</title>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@300;400;500&family=Shippori+Mincho:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      background: linear-gradient(135deg, #fff5f8 0%, #fdf0f8 50%, #f5f0ff 100%);
+      min-height: 100vh;
+      color: #5a4a5a;
+    }
+
+    /* ヘッダー */
+    header {
+      text-align: center;
+      padding: 56px 24px 40px;
+    }
+
+    .header-icon {
+      font-size: 48px;
+      display: block;
+      margin-bottom: 16px;
+      filter: drop-shadow(0 2px 8px rgba(220, 120, 160, 0.3));
+    }
+
+    header h1 {
+      font-family: 'Shippori Mincho', serif;
+      font-size: clamp(1.8rem, 5vw, 2.6rem);
+      font-weight: 500;
+      color: #c06090;
+      letter-spacing: 0.1em;
+      margin-bottom: 12px;
+    }
+
+    header p {
+      font-size: 0.95rem;
+      color: #a07090;
+      line-height: 1.8;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    /* 仕切り */
+    .divider {
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #e8a0c0, transparent);
+      margin: 24px auto 0;
+    }
+
+    /* カードグリッド */
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 28px;
+    }
+
+    /* プレゼントカード */
+    .gift-card {
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 20px;
+      padding: 32px 28px;
+      box-shadow: 0 4px 24px rgba(200, 120, 160, 0.1);
+      border: 1px solid rgba(230, 180, 210, 0.4);
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+    }
+
+    .gift-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 32px rgba(200, 120, 160, 0.2);
+    }
+
+    .gift-card:active {
+      transform: translateY(-2px);
+    }
+
+    .card-emoji {
+      font-size: 40px;
+      margin-bottom: 16px;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+    }
+
+    .card-tag {
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: #c06090;
+      background: #fde8f3;
+      border-radius: 20px;
+      padding: 4px 12px;
+      margin-bottom: 12px;
+      letter-spacing: 0.05em;
+    }
+
+    .card-title {
+      font-family: 'Shippori Mincho', serif;
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #7a4a6a;
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+
+    .card-desc {
+      font-size: 0.85rem;
+      color: #9a7a8a;
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    .card-lock {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      color: #b08090;
+      background: #fff0f7;
+      border-radius: 20px;
+      padding: 6px 16px;
+      border: 1px solid rgba(220, 160, 190, 0.4);
+    }
+
+    .card-lock span {
+      font-size: 0.9rem;
+    }
+
+    /* フッター */
+    footer {
+      text-align: center;
+      padding: 32px 24px;
+      font-size: 0.78rem;
+      color: #c0a0b0;
+      letter-spacing: 0.05em;
+    }
+
+    /* スマホ対応 */
+    @media (max-width: 480px) {
+      header {
+        padding: 40px 20px 32px;
+      }
+      main {
+        padding: 28px 16px 60px;
+      }
+      .grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <span class="header-icon">🎁</span>
+    <h1>りりかのプレゼント箱</h1>
+    <p>ママたちへ、こころを込めて。<br>受け取り方法はそれぞれのページでご確認ください。</p>
+    <div class="divider"></div>
+  </header>
+
+  <main>
+    <div class="grid">
+
+      <!-- プレゼント1 -->
+      <a class="gift-card" href="gift-1.html">
+        <div class="card-emoji">✨</div>
+        <div class="card-tag">プロンプト集</div>
+        <div class="card-title">タイトルをここに入力</div>
+        <div class="card-desc">プレゼントの説明文をここに書きます。どんな人に向けたもので、何に使えるかを伝えると◎</div>
+        <div class="card-lock"><span>🔒</span> パスワードで受け取る</div>
+      </a>
+
+      <!-- プレゼント2以降はここに追加 -->
+      <!-- 例：
+      <a class="gift-card" href="gift-2.html">
+        <div class="card-emoji">📝</div>
+        <div class="card-tag">ツールリンク</div>
+        <div class="card-title">タイトル</div>
+        <div class="card-desc">説明文</div>
+        <div class="card-lock"><span>🔒</span> パスワードで受け取る</div>
+      </a>
+      -->
+
+    </div>
+  </main>
+
+  <footer>© りりか</footer>
+
+</body>
+</html>
